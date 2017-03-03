@@ -1,18 +1,18 @@
-import { createStore, combineReducers } from 'redux';
-import createLogger from 'redux-logger';
-import thunk from 'redux-thunk';
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
+import thunkMiddleware from 'redux-thunk'
+
 // Reducers imports
 import items from './store/reducers/items';
 
 const configureStore = () => {
-    const logger = createLogger();
 
-    const store = createStore(combineReducers({
-        items
-    }), applyMiddleware(
-        logger,
-        thunk
-    ));
+    const store = createStore(items, 
+    compose(
+        applyMiddleware(
+        thunkMiddleware ),
+        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+        )
+    );
     
     return store;
 };
