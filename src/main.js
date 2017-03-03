@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { Router, Route, browserHistory } from 'react-router';
 import configureStore from './configureStore';
@@ -13,12 +14,12 @@ import './public/styles/main.scss';
 
 const store = configureStore();
 
-render(
+ReactDOM.render(
   <Provider store={store}>
     <Router history={browserHistory}>
-      <Route path="/" component={Search} />
-      <Route path="/items(?search=:query)" component={Search}>
-        <Route path=":id" component={Details} />
+      <Route path="/" component={SearchView} />
+      <Route path="/items" component={SearchView}>
+        <Route path=":id" component={DetailsView} />
       </Route>
     </Router>
   </Provider>,
