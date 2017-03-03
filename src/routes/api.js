@@ -4,7 +4,7 @@ const request = require('./utilities/requests.js');
 
 /* GET search products listing. */
 router.get('/items', function (req, res, next) {
-  
+
   const query = req.query.q;
   request
     .get(`https://api.mercadolibre.com/sites/MLA/search?q=${query}`)
@@ -12,10 +12,15 @@ router.get('/items', function (req, res, next) {
       try {
         // Parse the data
         const items = JSON.parse(body);
-        
+
         const filters = items.filters;
 
-        let categoriesFromRoot = filters.values != null ? filters.values.path_from_root.map((cat) => (cat.name)) : [];
+        let categoriesFromRoot = filters[0].values != null
+          ? filters[0]
+            .values[0]
+            .path_from_root
+            .map((cat) => (cat.name))
+          : [];
 
         let mappedItems = {
           author: {
@@ -27,23 +32,44 @@ router.get('/items', function (req, res, next) {
         };
 
         // Map the data
-        mappedItems.items = items.results.map((item) => {
-          return {
-            id: item.id,
-            title: item.title,
-            price: {
-              currency: item.currency_id,
-              amount: item.price - (item.price % 1),
-              decimals: item.price % 1
-            },
-            picture: item.thumbnail,
-            condition: item.condition,
-            free_shipping: item.shipping.free_shipping,
-            state: item.address.state_name
-          };
-        });
+        let promises = items
+          .results
+          .map((item) => {
 
-        res.json(mappedItems);
+            return request
+              .get(`https://api.mercadolibre.com/currencies/${item.currency_id}`)
+              .then((currencyBody) => {
+                try {
+                  // Parse Currency Body
+                  const currency = JSON.parse(currencyBody);
+                  const priceInt = Number.parseInt(item.price);
+                  const priceDec = Number.parseInt((item.price - priceInt) * 100);
+
+                  return {
+                    id: item.id,
+                    title: item.title,
+                    price: {
+                      currency: currency.symbol,
+                      amount: priceInt,
+                      decimals: priceDec
+                    },
+                    picture: item.thumbnail,
+                    condition: item.condition,
+                    free_shipping: item.shipping.free_shipping,
+                    state: item.address.state_name
+                  };
+                } catch (errorCurrencyParse) {
+                  next(errorCurrencyParse);
+                }
+              }, (errorCurrency) => {
+                next(errorCurrency);
+              });
+          });
+
+          Promise.all(promises).then((items) => {
+            mappedItems.items = items;
+            res.json(mappedItems);
+          });
       } catch (error) {
         next(error);
       }
@@ -100,7 +126,7 @@ router.get('/items/:id', function (req, res, next) {
                         condition: item.condition,
                         free_shipping: item.shipping.free_shipping,
                         sold_quantity: item.sold_quantity,
-                        description: itemDescription.text || itemDescription.plain_text || ''
+                        description: itemDescription.plain_text || itemDescription.text || ''
                       }
                     };
 

@@ -21,7 +21,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 // Routes
-app.get('/', function (req, res) {
+app.get('/', function (req, res, next) {
+    res.sendFile(path.join(__dirname, 'dist/index.html'))
+});
+
+app.get('/items', function (req, res, next) {
     res.sendFile(path.join(__dirname, 'dist/index.html'))
 });
 
