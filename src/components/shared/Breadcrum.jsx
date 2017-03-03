@@ -2,11 +2,11 @@ import React from 'react';
 
 export default function Breadcrum(props) {
     return (
-        <ol class="breadcrumb">
+        <ol className="breadcrumb">
             {
-                props.items.map((item, index) => {
+                props.items && props.items.map((item, index) => {
                     return (
-                        <li key={`${item}-${index}`} className={`breadcrum--item${props.items.length === (index+1)? ' breadcrum--item__active' : ''}`}>
+                        <li key={`${item}-${index}`} className={`breadcrum__item${props.items.length === (index+1)? ' breadcrum__item-active' : ''}`}>
                             {item}
                         </li>
                     ) ;
