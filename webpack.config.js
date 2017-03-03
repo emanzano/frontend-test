@@ -5,8 +5,9 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
     entry: './src/main.js',
     output: {
-        path: 'dist/js',
-        filename: 'bundle.js'
+        path: 'dist',
+        filename: 'js/bundle.js',
+        publicPath: '/public'
     },
     module: {
         loaders: [
@@ -24,25 +25,18 @@ module.exports = {
     },
     plugins: [
         new ExtractTextPlugin({
-            filename: 'public/styles/style.css',
+            filename: 'styles/style.css',
             allChunks: true
         }),
         new webpack.NoEmitOnErrorsPlugin(),
 		new webpack.HotModuleReplacementPlugin(),
 		new HtmlWebpackPlugin({
 			template: './src/views/template.html',
-            filename: './dist/index.html',
-			files: {
-				css: ['./styles/style.css'],
-				js: ['./js/bundle.js'],
-			}
+            filename: './index.html'
 		}),
 		new HtmlWebpackPlugin({
 			template: './src/views/error.html',
-            filename: './dist/error.html',
-			files: {
-				css: ['./styles/style.css'],
-			}
+            filename: './error.html'
 		}),
 
     ]
