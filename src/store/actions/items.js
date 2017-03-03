@@ -27,9 +27,9 @@ function gettingItemsSuccess(itemsList, categories, query) {
 
 function gettingItemsFailure(error) {
     return {
-        type: GETTING_ITEMS,
+        type: GETTING_ITEMS_FAILURE,
         payload: {
-            gettingItems: true,
+            gettingItems: false,
             gettingItemsSuccess: false,
             error
         }
@@ -37,18 +37,65 @@ function gettingItemsFailure(error) {
 }
 
 export function getItems(query) {
-    return function (dispatch) {
+    return function getItemsAction(dispatch) {
         dispatch(gettingItems());
 
-        fetch(`/api/items?q=${query}`, {method: 'GET'}).then((res) => {
-            if (res.status !== 200) {
-                dispatch(gettingItemsFailure(new Error(`Bad response from server. Status Code: ${res.status}`)));
-            }
-            return res.json();
-        }).then((response) => {
-            dispatch(gettingItemsSuccess(response.items, response.categories, query));
+        return fetch(`/api/items?q=${query}`, {method: 'GET'})
+        .then(res => res.json())
+        .then((json) => {
+            dispatch(gettingItemsSuccess(json.items, json.categories, query));
         }, (error) => {
             dispatch(gettingItemsFailure(error));
+        });
+    }
+}
+
+export const GETTING_ITEM = "GETTING_ITEM";
+export const GETTING_ITEM_SUCCESS = "GETTING_ITEM_SUCCESS";
+export const GETTING_ITEM_FAILURE = "GETTING_ITEM_FAILURE";
+
+function gettingItem() {
+    return {
+        type: GETTING_ITEM,
+        payload: {
+            gettingItem: true,
+            gettingItemSuccess: false
+        }
+    }
+}
+
+function gettingItemSuccess(item) {
+    return {
+        type: GETTING_ITEM_SUCCESS,
+        payload: {
+            gettingItem: false,
+            gettingItemSuccess: true,
+            item
+        }
+    }
+}
+
+function gettingItemFailure(error) {
+    return {
+        type: GETTING_ITEM_FAILURE,
+        payload: {
+            gettingItem: false,
+            gettingItemSuccess: false,
+            error
+        }
+    }
+}
+
+export function getItem(idquery) {
+    return function getItemAction(dispatch) {
+        dispatch(gettingItem());
+
+        return fetch(`/api/items/${id}`, {method: 'GET'})
+        .then(res => res.json() )
+        .then((json) => {
+            dispatch(gettingItemSuccess(json.item));
+        }, (error) => {
+            dispatch(gettingItemFailure(error));
         });;
 
     }
