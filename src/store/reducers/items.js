@@ -16,7 +16,7 @@ const initialState = {
     query: '',
     gettingItem: false,
     gettingItemSuccess: false,
-    item: {}
+    item: null
 };
 
 export default function items(state = initialState, action) {

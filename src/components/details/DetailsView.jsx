@@ -7,12 +7,12 @@ import Breadcrum from '../shared/Breadcrum.jsx';
 export default function DetailsView(props){
     return(
         <div className="container">
-            <Header query={props.query} onSearch={props.onSearch}/>
+            <Header query={props.query} onSearch={props.onSearch} handleOnChange={props.handleOnChange}/>
             {
                 props.categories.lentgh > 0 ? (<Breadcrum items={props.categories}/>) : null
             }
             {
-                props.items.length > 0 ? (<Body item={props.item} isItemDetail={true}/>) : null
+                props.item && <Body item={props.item} isItemDetail={true}/>
             }
         </div>
     );

@@ -18,9 +18,8 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={browserHistory}>
       <Route path="/" component={SearchView} />
-      <Route path="/items" component={SearchView}>
-        <Route path=":id" component={DetailsView} />
-      </Route>
+      <Route path="/items" component={SearchView}/>
+      <Route path="/items/:id" component={DetailsView} />
     </Router>
   </Provider>,
   document.getElementById('root')

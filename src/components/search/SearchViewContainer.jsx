@@ -32,16 +32,6 @@ class SearchViewContainerComponent extends React.Component {
         }
     }
 
-    componentWillUpdate(){
-        const { dispatch, gettingItemsSuccess } = this.props;
-
-        const { router: { location: { query } } } = this.context;
-
-        /*if(query != null && Object.keys(query).length > 0 && query.search != null && !gettingItemsSuccess){
-            dispatch(getItems(query.search));
-        }*/
-    }
-
     handleOnChange(event) {
         this.setState({query: event.target.value});
     }
@@ -58,8 +48,8 @@ class SearchViewContainerComponent extends React.Component {
     }
 
     onClickItem(itemId){
-        console.log(itemId);
-        debugger;
+        event.preventDefault();
+        this.context.router.replace(`/items/${itemId}`);
     }
 
     render() {

@@ -66,7 +66,9 @@ router.get('/items', function (req, res, next) {
               });
           });
 
-          Promise.all(promises).then((items) => {
+        Promise
+          .all(promises)
+          .then((items) => {
             mappedItems.items = items;
             res.json(mappedItems);
           });
@@ -108,29 +110,44 @@ router.get('/items/:id', function (req, res, next) {
                         return cat.name;
                       });
 
-                    // Map the data
-                    var mappedItem = {
-                      author: {
-                        name: 'Ezequiel Agustín',
-                        lastname: 'Manzano'
-                      },
-                      item: {
-                        id: item.id,
-                        title: item.title,
-                        price: {
-                          currency: item.currency_id,
-                          amount: item.price - (item.price % 1),
-                          decimals: item.price % 1
-                        },
-                        picture: item.pictures[0].url,
-                        condition: item.condition,
-                        free_shipping: item.shipping.free_shipping,
-                        sold_quantity: item.sold_quantity,
-                        description: itemDescription.plain_text || itemDescription.text || ''
-                      }
-                    };
+                    request
+                      .get(`https://api.mercadolibre.com/currencies/${item.currency_id}`)
+                      .then((currencyBody) => {
+                        try {
+                          // Parse Currency Body
+                          const currency = JSON.parse(currencyBody);
+                          const priceInt = Number.parseInt(item.price);
+                          const priceDec = Number.parseInt((item.price - priceInt) * 100);
 
-                    res.json(mappedItem);
+                          // Map the data
+                          var mappedItem = {
+                            author: {
+                              name: 'Ezequiel Agustín',
+                              lastname: 'Manzano'
+                            },
+                            item: {
+                              id: item.id,
+                              title: item.title,
+                              price: {
+                                currency: currency.symbol,
+                                amount: priceInt,
+                                decimals: priceDec
+                              },
+                              picture: item.pictures[0].url,
+                              condition: item.condition,
+                              free_shipping: item.shipping.free_shipping,
+                              sold_quantity: item.sold_quantity,
+                              description: itemDescription.plain_text || itemDescription.text || ''
+                            }
+                          };
+
+                          res.json(mappedItem);
+                        } catch (errorCurrencyParse) {
+                          next(errorCurrencyParse);
+                        }
+                      }, (errorCurrency) => {
+                        next(errorCurrency);
+                      });
                   } catch (error) {
                     next(error);
                   }

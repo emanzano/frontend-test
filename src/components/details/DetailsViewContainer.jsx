@@ -6,46 +6,62 @@ import {getItem} from '../../store/actions/items.js';
 import DetailsView from './DetailsView.jsx';
 
 class DetailsViewContainerComponent extends React.Component {
-    constructor(props) {
-        super(props);
+
+    static contextTypes = {
+        router: React.PropTypes.object.isRequired
+    };
+
+    constructor(props, context) {
+        super(props, context);
         this.state = {
             query: this.props.query
         };
 
         this.onSearch = this.onSearch.bind(this);
+        this.handleOnChange = this.handleOnChange.bind(this);
     }
 
     componentWillMount() {
-        const {params, dispatch, gettingItemSuccess} = this.props;
+        const { dispatch, gettingItemSuccess } = this.props;
 
-        if(params.query != null && params.query.length && !gettingItemSuccess){
-            dispatch(getItems(query));
+        const { router: { params } } = this.context;
+
+        if(params != null && Object.keys(params).length > 0 && params.id != null && !gettingItemSuccess){
+            dispatch(getItem(params.id));
         }
     }
 
-    onSearch(e){
+    handleOnChange(event) {
+        this.setState({query: event.target.value});
+    }
+
+    onSearch(event){
+        const { query } = this.state;
+        const { dispatch } = this.props;
         // Detect "click" or "enter" to submit the query
-        console.log(e);
-        debugger;
+        if ( (event.type === 'keypress' && event.key === 'Enter') || event.type === 'click'){
+            event.preventDefault();
+            this.context.router.replace(`/items?search=${query}`);
+        }
     }
 
     render() {
         const { item, categories } = this.props;
         const { query } = this.state;
-        const { onSearch } = this;
+        const { onSearch, handleOnChange } = this;
 
         return (
-            <DetailsView item={item} query={query} onSearch={onSearch} categories={categories}/>
+            <DetailsView item={item} onSearch={onSearch} handleOnChange={handleOnChange} categories={categories} query={query}/>
         );
     }
 }
 
 const mapStateToProps = (state) => {
   return { 
-      categories: state.categories,
-      gettingItemSuccess: state.gettingItemSuccess,
       item: state.item,
-      query: state.query
+      categories: state.categories,
+      query: state.query,
+      gettingItemSuccess: state.gettingItemSuccess
     }
 }
 

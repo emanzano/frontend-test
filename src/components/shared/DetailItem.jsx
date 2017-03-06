@@ -9,7 +9,7 @@ export default function DetailItem(props) {
                 </div>
                 <div className="buy-info">
                     <span className="buy-info__condition-amount">{`${props.item.condition} - ${props.item.sold_quantity} vendidos`}</span>
-                    <h3 className="buy-info__item-title">{props.item.title}</h3>
+                    <h1 className="buy-info__item-title">{props.item.title}</h1>
                     <h1 className="price">{`${props.item.price.currency} ${props.item.price.amount}`}
                         <span className="price__decimals">{props.item.price.decimals}</span>
                     </h1>

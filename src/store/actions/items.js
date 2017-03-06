@@ -86,7 +86,7 @@ function gettingItemFailure(error) {
     }
 }
 
-export function getItem(idquery) {
+export function getItem(id) {
     return function getItemAction(dispatch) {
         dispatch(gettingItem());
 

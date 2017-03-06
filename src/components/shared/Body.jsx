@@ -7,7 +7,7 @@ export default function Body(props) {
         <div className="body">
             {
                 props.isItemDetail ? (
-                    <DetailItem item={item}/>
+                    props.item && <DetailItem item={props.item}/>
                 ) :(
                     <div className="body__list">
                         {
